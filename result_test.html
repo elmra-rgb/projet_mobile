@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport - Privacy Posture</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #0d1117; color: #c9d1d9; }
+        .card { background-color: #161b22; border-color: #30363d; }
+        .score-circle {
+            width: 150px; height: 150px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; font-weight: bold;
+            margin: 0 auto;
+            border: 8px solid;
+        }
+        .score-excellent { border-color: #2ea043; color: #2ea043; }
+        .score-warning { border-color: #d29922; color: #d29922; }
+        .score-danger { border-color: #f85149; color: #f85149; }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5 mb-5">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-file-earmark-bar-graph text-primary"></i> Rapport d'Analyse: <span class="text-white">F-Droid-Test-App.apk</span></h2>
+        <a href="/" class="btn btn-outline-light"><i class="bi bi-arrow-left"></i> Retour</a>
+    </div>
+
+    
+
+    <div class="row">
+        <!-- SCORE & PROFILE -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-secondary mb-4">Privacy Score</h5>
+                    
+                    
+                    
+                        
+                    
+                    
+                    <div class="score-circle score-warning mb-4">
+                        60
+                    </div>
+                    
+                    <h5 class="card-title text-secondary mt-5 mb-3">Contexte Analysé</h5>
+                    <span class="badge bg-secondary fs-6 p-2">EDUCATION</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TRACKERS & DATA COLLECTED -->
+        <div class="col-md-8 mb-4">
+            <div class="card h-100 shadow-sm mb-3">
+                <div class="card-header bg-dark border-bottom border-secondary">
+                    <h5 class="mb-0"><i class="bi bi-bug text-warning"></i> Trackers & SDKs Détectés (0)</h5>
+                </div>
+                <div class="card-body">
+                    
+                        <p class="text-success"><i class="bi bi-check-circle-fill"></i> Aucun tracker connu détecté.</p>
+                    
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark border-bottom border-secondary">
+                    <h5 class="mb-0"><i class="bi bi-database text-info"></i> Données Collectées Probables (2)</h5>
+                </div>
+                <div class="card-body">
+                    
+                        <div class="d-flex flex-wrap gap-2">
+                            
+                                <span class="badge bg-info text-dark fs-6">Files, Photos, Media</span>
+                            
+                                <span class="badge bg-info text-dark fs-6">Camera / Photos / Videos</span>
+                            
+                        </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PERMISSIONS ANALYSIS -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark border-bottom border-secondary">
+                    <h5 class="mb-0"><i class="bi bi-shield-exclamation text-primary"></i> Checklist & Analyse IA des Permissions</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Permission Demandée</th>
+                                    <th>Niveau de Risque Intial</th>
+                                    <th>Analyse IA (Contexte: education)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>CHANGE_WIFI_MULTICAST_STATE</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.CHANGE_WIFI_MULTICAST_STATE</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>RECEIVE_BOOT_COMPLETED</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.RECEIVE_BOOT_COMPLETED</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>READ_EXTERNAL_STORAGE</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.READ_EXTERNAL_STORAGE</small></td>
+                                        <td><span class="badge bg-info text-dark">SENSITIVE</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>WAKE_LOCK</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.WAKE_LOCK</small></td>
+                                        <td><span class="badge bg-success">NORMAL</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>BLUETOOTH_CONNECT</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.BLUETOOTH_CONNECT</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="table-warning">
+                                        <td><code>REQUEST_INSTALL_PACKAGES</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.REQUEST_INSTALL_PACKAGES</small></td>
+                                        <td><span class="badge bg-warning text-dark">DANGEROUS</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>WRITE_SETTINGS</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.WRITE_SETTINGS</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>UPDATE_REPOS</code><br><small class="text-muted" style="font-size:0.7em;">org.fdroid.fdroid.permission.UPDATE_REPOS</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>QUERY_ALL_PACKAGES</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.QUERY_ALL_PACKAGES</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>ACCESS_NETWORK_STATE</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.ACCESS_NETWORK_STATE</small></td>
+                                        <td><span class="badge bg-success">NORMAL</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>USB_PERMISSION</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.USB_PERMISSION</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>CHANGE_WIFI_STATE</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.CHANGE_WIFI_STATE</small></td>
+                                        <td><span class="badge bg-success">NORMAL</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>BLUETOOTH</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.BLUETOOTH</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>ENFORCE_UPDATE_OWNERSHIP</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.ENFORCE_UPDATE_OWNERSHIP</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>FOREGROUND_SERVICE</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.FOREGROUND_SERVICE</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="table-warning">
+                                        <td><code>MANAGE_EXTERNAL_STORAGE</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.MANAGE_EXTERNAL_STORAGE</small></td>
+                                        <td><span class="badge bg-warning text-dark">DANGEROUS</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>CHANGE_NETWORK_STATE</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.CHANGE_NETWORK_STATE</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>POST_NOTIFICATIONS</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.POST_NOTIFICATIONS</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>REQUEST_DELETE_PACKAGES</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.REQUEST_DELETE_PACKAGES</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>ACCESS_WIFI_STATE</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.ACCESS_WIFI_STATE</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>UPDATE_PACKAGES_WITHOUT_USER_ACTION</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>NFC</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.NFC</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>INTERNET</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.INTERNET</small></td>
+                                        <td><span class="badge bg-success">NORMAL</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION</code><br><small class="text-muted" style="font-size:0.7em;">org.fdroid.fdroid.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>BLUETOOTH_ADMIN</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.BLUETOOTH_ADMIN</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>WRITE_EXTERNAL_STORAGE</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.WRITE_EXTERNAL_STORAGE</small></td>
+                                        <td><span class="badge bg-info text-dark">SENSITIVE</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="table-warning">
+                                        <td><code>CAMERA</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.CAMERA</small></td>
+                                        <td><span class="badge bg-warning text-dark">DANGEROUS</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                                    
+                                        
+                                        
+                                    
+                                    
+                                    <tr class="">
+                                        <td><code>BLUETOOTH_SCAN</code><br><small class="text-muted" style="font-size:0.7em;">android.permission.BLUETOOTH_SCAN</small></td>
+                                        <td><span class="badge bg-success">UNKNOWN</span></td>
+                                        <td>
+                                            
+                                                <span class="text-muted">Standard</span>
+                                            
+                                        </td>
+                                    </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

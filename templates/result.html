@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport Privacy — {{ analysis.filename }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: rgba(17, 24, 39, 0.7);
+            --border-color: rgba(99, 102, 241, 0.15);
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+        }
+
+        * { font-family: 'Inter', sans-serif; }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle at 20% 30%, rgba(99,102,241,0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(139,92,246,0.03) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* ── Glass card ── */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .card-header-custom {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(99, 102, 241, 0.03);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header-custom h5 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .card-header-custom .header-icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .card-body-custom { padding: 24px; }
+
+        /* ── Score gauge ── */
+        .score-container {
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .score-ring {
+            position: relative;
+            width: 180px; height: 180px;
+            margin: 0 auto 20px;
+        }
+
+        .score-ring svg {
+            width: 100%; height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .score-ring .bg-ring {
+            fill: none;
+            stroke: rgba(99, 102, 241, 0.1);
+            stroke-width: 10;
+        }
+
+        .score-ring .progress-ring {
+            fill: none;
+            stroke-width: 10;
+            stroke-linecap: round;
+            stroke-dasharray: 502;
+            stroke-dashoffset: 502;
+            transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .score-ring .score-value {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .score-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            max-width: 260px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* ── Stat cards ── */
+        .stat-mini {
+            text-align: center;
+            padding: 16px 12px;
+            border-radius: 14px;
+            background: rgba(99, 102, 241, 0.04);
+            border: 1px solid rgba(99, 102, 241, 0.08);
+        }
+
+        .stat-mini .stat-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .stat-mini .stat-label {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 6px;
+        }
+
+        /* ── Breakdown bar ── */
+        .breakdown-item {
+            display: flex; align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+        }
+
+        .breakdown-item .bar-label {
+            font-size: 0.82rem;
+            width: 100px;
+            flex-shrink: 0;
+            color: var(--text-secondary);
+        }
+
+        .breakdown-item .bar-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .breakdown-item .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .breakdown-item .bar-value {
+            font-size: 0.82rem;
+            font-weight: 700;
+            width: 50px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* ── Checklist ── */
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+
+        .checklist-item:hover {
+            background: rgba(99, 102, 241, 0.04);
+        }
+
+        .checklist-item.passed { border-left: 3px solid var(--accent-green); }
+        .checklist-item.failed { border-left: 3px solid var(--accent-red); }
+
+        .checklist-icon {
+            width: 28px; height: 28px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .checklist-icon.pass { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+        .checklist-icon.fail { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+
+        .checklist-rule { font-weight: 600; font-size: 0.9rem; }
+        .checklist-detail { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+
+        /* ── Recommendations ── */
+        .reco-item {
+            padding: 16px 18px;
+            border-radius: 14px;
+            margin-bottom: 10px;
+            border: 1px solid;
+        }
+
+        .reco-item.severity-high {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .reco-item.severity-medium {
+            background: rgba(245, 158, 11, 0.05);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+        .reco-title {
+            font-weight: 700;
+            font-size: 0.92rem;
+            margin-bottom: 4px;
+        }
+
+        .reco-detail {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ── Tracker badge ── */
+        .tracker-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            margin: 3px;
+        }
+
+        .tracker-badge.cat-ads { background: rgba(239,68,68,0.1); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+        .tracker-badge.cat-analytics { background: rgba(245,158,11,0.1); color: #fcd34d; border: 1px solid rgba(245,158,11,0.2); }
+        .tracker-badge.cat-attribution { background: rgba(139,92,246,0.1); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.2); }
+        .tracker-badge.cat-crash { background: rgba(6,182,212,0.1); color: #67e8f9; border: 1px solid rgba(6,182,212,0.2); }
+
+        /* ── Data badge ── */
+        .data-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            font-size: 0.85rem;
+            margin: 3px;
+        }
+
+        /* ── Permissions table ── */
+        .perm-table { width: 100%; border-collapse: separate; border-spacing: 0 4px; }
+
+        .perm-table th {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .perm-table td {
+            padding: 12px 16px;
+            font-size: 0.88rem;
+            vertical-align: middle;
+        }
+
+        .perm-table tbody tr {
+            transition: background 0.2s;
+        }
+
+        .perm-table tbody tr:hover {
+            background: rgba(99, 102, 241, 0.04);
+        }
+
+        .perm-name code {
+            font-family: 'Inter', monospace;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .perm-full {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
+
+        .risk-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .risk-excessive { background: rgba(239,68,68,0.15); color: #fca5a5; }
+        .risk-dangerous { background: rgba(245,158,11,0.15); color: #fcd34d; }
+        .risk-sensitive { background: rgba(6,182,212,0.15); color: #67e8f9; }
+        .risk-normal { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+        .risk-unknown { background: rgba(148,163,184,0.15); color: #94a3b8; }
+
+        .perm-justification {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        /* ── Secrets ── */
+        .secret-item {
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: rgba(239, 68, 68, 0.04);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            font-size: 0.8rem;
+            margin-bottom: 6px;
+            word-break: break-all;
+            color: var(--text-secondary);
+        }
+
+        /* ── App Info bar ── */
+        .app-info-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 16px 24px;
+            background: rgba(99, 102, 241, 0.03);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .app-info-item {
+            font-size: 0.82rem;
+        }
+
+        .app-info-item .info-label {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .app-info-item .info-value {
+            font-weight: 600;
+        }
+
+        /* ── Buttons ── */
+        .btn-back {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--text-primary);
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 10px 20px;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: rgba(99, 102, 241, 0.2);
+            color: white;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            color: white;
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 10px 20px;
+            transition: all 0.3s;
+        }
+
+        .btn-print:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+            color: white;
+        }
+
+        /* ── Fade-in ── */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.6s ease forwards;
+        }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        .fd1 { animation-delay: 0.1s; }
+        .fd2 { animation-delay: 0.2s; }
+        .fd3 { animation-delay: 0.3s; }
+        .fd4 { animation-delay: 0.4s; }
+        .fd5 { animation-delay: 0.5s; }
+        .fd6 { animation-delay: 0.6s; }
+        .fd7 { animation-delay: 0.7s; }
+
+        /* ── Charts ── */
+        .chart-container {
+            position: relative;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        /* ── Print ── */
+        @media print {
+            body { background: white !important; color: black !important; }
+            body::before { display: none; }
+            .glass-card { background: white !important; border: 1px solid #ddd !important; box-shadow: none !important; }
+            .no-print { display: none !important; }
+            .card-header-custom { background: #f5f5f5 !important; }
+            .text-secondary, .text-primary { color: #333 !important; }
+            .fade-up { animation: none !important; opacity: 1 !important; transform: none !important; }
+            .checklist-item, .reco-item, .secret-item, .tracker-badge, .data-badge, .risk-badge, .stat-mini { 
+                border: 1px solid #ccc !important; 
+                background: #f9f9f9 !important;
+                color: black !important;
+            }
+        }
+
+        /* ── AI Badge ── */
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ai-badge.gemini {
+            background: linear-gradient(135deg, rgba(66, 133, 244, 0.15), rgba(219, 68, 55, 0.15), rgba(244, 180, 0, 0.15), rgba(15, 157, 88, 0.15));
+            border: 1px solid rgba(66, 133, 244, 0.3);
+            color: #93c5fd;
+            animation: aiGlow 3s ease-in-out infinite;
+        }
+
+        .ai-badge.heuristic {
+            background: rgba(148, 163, 184, 0.1);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            color: var(--text-secondary);
+        }
+
+        @keyframes aiGlow {
+            0%, 100% { box-shadow: 0 0 8px rgba(66, 133, 244, 0.15); }
+            50% { box-shadow: 0 0 16px rgba(66, 133, 244, 0.3); }
+        }
+
+        .exec-summary {
+            background: linear-gradient(135deg, rgba(66, 133, 244, 0.05), rgba(139, 92, 246, 0.05));
+            border: 1px solid rgba(66, 133, 244, 0.15);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+        }
+
+        .exec-summary .summary-text {
+            font-size: 0.92rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 fade-up">
+        <div>
+            <h2 class="m-0 fw-800" style="font-size: 1.5rem;">
+                <i class="bi bi-file-earmark-bar-graph" style="color: var(--accent-primary);"></i>
+                Rapport d'Analyse Privacy
+            </h2>
+            <div class="d-flex align-items-center gap-2 mt-1">
+                <p class="text-secondary mb-0" style="font-size: 0.9rem;">
+                    {{ analysis.filename }} — Profil : <strong style="color: var(--accent-primary);">{{ analysis.profile_label }}</strong>
+                </p>
+                {% if analysis.ai_powered %}
+                <span class="ai-badge gemini"><i class="bi bi-stars"></i> Gemini AI</span>
+                {% else %}
+                <span class="ai-badge heuristic"><i class="bi bi-cpu"></i> Heuristique</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="d-flex gap-2 mt-2 mt-md-0 no-print">
+            <button onclick="window.print()" class="btn btn-print"><i class="bi bi-printer"></i> Exporter PDF</button>
+            <a href="/" class="btn btn-back"><i class="bi bi-arrow-left"></i> Nouvelle Analyse</a>
+        </div>
+    </div>
+
+    {% if analysis.error %}
+    <div class="glass-card p-4 fade-up" style="border-color: rgba(239, 68, 68, 0.3);">
+        <h4 style="color: var(--accent-red);"><i class="bi bi-exclamation-triangle-fill"></i> Erreur lors de l'analyse</h4>
+        <p class="mb-0" style="color: var(--text-secondary);">{{ analysis.error }}</p>
+    </div>
+    {% else %}
+
+    <!-- App Info -->
+    {% if analysis.app_info %}
+    <div class="glass-card mb-4 fade-up fd1">
+        <div class="app-info-bar">
+            <div class="app-info-item">
+                <div class="info-label">Package</div>
+                <div class="info-value"><code>{{ analysis.app_info.package }}</code></div>
+            </div>
+            <div class="app-info-item">
+                <div class="info-label">Nom</div>
+                <div class="info-value">{{ analysis.app_info.app_name }}</div>
+            </div>
+            <div class="app-info-item">
+                <div class="info-label">Version</div>
+                <div class="info-value">{{ analysis.app_info.version_name }} ({{ analysis.app_info.version_code }})</div>
+            </div>
+            <div class="app-info-item">
+                <div class="info-label">Min SDK</div>
+                <div class="info-value">{{ analysis.app_info.min_sdk }}</div>
+            </div>
+            <div class="app-info-item">
+                <div class="info-label">Target SDK</div>
+                <div class="info-value">{{ analysis.app_info.target_sdk }}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Executive Summary (Gemini AI) -->
+    {% if analysis.executive_summary %}
+    <div class="exec-summary fade-up fd1">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-stars" style="color: #93c5fd; font-size: 1.1rem;"></i>
+            <strong style="font-size: 0.9rem;">Résumé Exécutif — Analyse Gemini AI</strong>
+        </div>
+        <div class="summary-text">{{ analysis.executive_summary }}</div>
+    </div>
+    {% endif %}
+
+    <!-- ═══════ Row 1: Score + Stats + Charts ═══════ -->
+    <div class="row g-4 mb-4">
+
+        <!-- Score -->
+        <div class="col-md-4 fade-up fd2">
+            <div class="glass-card h-100">
+                <div class="score-container">
+                    <div class="score-ring">
+                        <svg viewBox="0 0 180 180">
+                            <circle class="bg-ring" cx="90" cy="90" r="80"/>
+                            <circle class="progress-ring" id="scoreRing" cx="90" cy="90" r="80"/>
+                        </svg>
+                        <div class="score-value" id="scoreValue" style="color: var(--accent-primary);">0</div>
+                    </div>
+                    <div class="score-label" id="scoreLabel">{{ analysis.score.label }}</div>
+                    <div class="score-desc">{{ analysis.score.description }}</div>
+
+                    <!-- Score breakdown -->
+                    <div class="mt-4 px-3 text-start">
+                        <div class="breakdown-item">
+                            <span class="bar-label">Permissions</span>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: {{ [analysis.score.breakdown.permissions, 100] | min }}%; background: var(--accent-yellow);"></div>
+                            </div>
+                            <span class="bar-value" style="color: var(--accent-yellow);">-{{ analysis.score.breakdown.permissions }}</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="bar-label">Trackers</span>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: {{ [analysis.score.breakdown.trackers, 100] | min }}%; background: var(--accent-red);"></div>
+                            </div>
+                            <span class="bar-value" style="color: var(--accent-red);">-{{ analysis.score.breakdown.trackers }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Radar Chart: App vs Ideal -->
+        <div class="col-md-4 fade-up fd3">
+            <div class="glass-card h-100">
+                <div class="card-header-custom">
+                    <div class="header-icon" style="background: rgba(99,102,241,0.1); color: var(--accent-primary);">
+                        <i class="bi bi-radar"></i>
+                    </div>
+                    <h5>App vs Profil Idéal</h5>
+                </div>
+                <div class="card-body-custom d-flex flex-column align-items-center justify-content-center">
+                    <div class="mb-3 text-center" style="font-size: 0.8rem; color: var(--text-secondary);">
+                        Comparaison de la posture de l'application par rapport à la norme pour la catégorie <strong>{{ analysis.profile_label }}</strong>.
+                    </div>
+                    <div class="chart-container" style="width: 100%; max-width: 300px; aspect-ratio: 1;">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tracker distribution chart -->
+        <div class="col-md-4 fade-up fd4">
+            <div class="glass-card h-100">
+                <div class="card-header-custom">
+                    <div class="header-icon" style="background: rgba(245,158,11,0.1); color: var(--accent-yellow);">
+                        <i class="bi bi-bug"></i>
+                    </div>
+                    <h5>Trackers & SDKs ({{ analysis.trackers | length }})</h5>
+                </div>
+                <div class="card-body-custom">
+                    {% if analysis.trackers %}
+                        <div class="mb-3">
+                            {% for tracker in analysis.trackers %}
+                            <span class="tracker-badge cat-{{ tracker.category }}">
+                                {% if tracker.category == 'ads' %}<i class="bi bi-megaphone"></i>
+                                {% elif tracker.category == 'analytics' %}<i class="bi bi-graph-up"></i>
+                                {% elif tracker.category == 'attribution' %}<i class="bi bi-link-45deg"></i>
+                                {% elif tracker.category == 'crash' %}<i class="bi bi-bug"></i>
+                                {% endif %}
+                                {{ tracker.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        {% if analysis.tracker_distribution %}
+                        <div class="chart-container mt-3" style="max-width: 200px;">
+                            <canvas id="trackerChart"></canvas>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-check-circle-fill" style="font-size: 2.5rem; color: var(--accent-green);"></i>
+                            <p class="mt-2 mb-0" style="color: var(--accent-green); font-weight: 600;">Aucun tracker connu détecté</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ Row 2: Checklist + Recommendations ═══════ -->
+    <div class="row g-4 mb-4">
+
+        <!-- Privacy Checklist -->
+        <div class="col-md-6 fade-up fd5">
+            <div class="glass-card h-100">
+                <div class="card-header-custom">
+                    <div class="header-icon" style="background: rgba(16,185,129,0.1); color: var(--accent-green);">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+                    <h5>Privacy Checklist IA — {{ analysis.profile_label }}</h5>
+                    <span class="ms-auto" style="font-size: 0.8rem; color: var(--text-secondary);">
+                        {{ analysis.stats.checklist_passed }}/{{ analysis.stats.checklist_total }} validé(s)
+                    </span>
+                </div>
+                <div class="card-body-custom">
+                    {% if analysis.checklist %}
+                        <p class="mb-3" style="font-size: 0.82rem; color: var(--text-secondary); font-style: italic;">
+                            {{ analysis.profile_message }}
+                        </p>
+                        {% for item in analysis.checklist %}
+                        <div class="checklist-item {{ 'passed' if item.passed else 'failed' }}">
+                            <div class="checklist-icon {{ 'pass' if item.passed else 'fail' }}">
+                                <i class="bi {{ 'bi-check-lg' if item.passed else 'bi-x-lg' }}"></i>
+                            </div>
+                            <div>
+                                <div class="checklist-rule">{{ item.rule }}</div>
+                                <div class="checklist-detail">{{ item.detail }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-secondary">Aucune checklist disponible.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Minimization Recommendations -->
+        <div class="col-md-6 fade-up fd5">
+            <div class="glass-card h-100">
+                <div class="card-header-custom">
+                    <div class="header-icon" style="background: rgba(245,158,11,0.1); color: var(--accent-yellow);">
+                        <i class="bi bi-lightbulb"></i>
+                    </div>
+                    <h5>Recommandations de Minimisation</h5>
+                    <span class="ms-auto" style="font-size: 0.8rem; color: var(--text-secondary);">
+                        {{ analysis.recommendations | length }} action(s)
+                    </span>
+                </div>
+                <div class="card-body-custom">
+                    {% if analysis.recommendations %}
+                        {% for reco in analysis.recommendations %}
+                        <div class="reco-item severity-{{ reco.severity }}">
+                            <div class="reco-title">{{ reco.icon }} {{ reco.title }}</div>
+                            <div class="reco-detail">{{ reco.detail }}</div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-hand-thumbs-up-fill" style="font-size: 2.5rem; color: var(--accent-green);"></i>
+                            <p class="mt-2 mb-0" style="color: var(--accent-green); font-weight: 600;">Aucune recommandation — l'app semble bien optimisée !</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ Row 3: Data Collected + Secrets ═══════ -->
+    <div class="row g-4 mb-4">
+
+        <!-- Data Collected -->
+        <div class="col-md-6 fade-up fd6">
+            <div class="glass-card h-100">
+                <div class="card-header-custom">
+                    <div class="header-icon" style="background: rgba(6,182,212,0.1); color: var(--accent-cyan);">
+                        <i class="bi bi-database"></i>
+                    </div>
+                    <h5>Données Collectées Probables ({{ analysis.data | length }})</h5>
+                </div>
+                <div class="card-body-custom">
+                    {% if analysis.data %}
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for d in analysis.data %}
+                            <span class="data-badge">{{ d.icon }} {{ d.label }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="bi bi-check-circle-fill" style="font-size: 2rem; color: var(--accent-green);"></i>
+                            <p class="mt-2 mb-0" style="color: var(--accent-green); font-weight: 600;">Aucune donnée sensible déduite</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Secrets -->
+        <div class="col-md-6 fade-up fd6">
+            <div class="glass-card h-100">
+                <div class="card-header-custom">
+                    <div class="header-icon" style="background: rgba(239,68,68,0.1); color: var(--accent-red);">
+                        <i class="bi bi-key"></i>
+                    </div>
+                    <h5>Secrets & URLs En Dur ({{ analysis.secrets | length }})</h5>
+                </div>
+                <div class="card-body-custom" style="max-height: 300px; overflow-y: auto;">
+                    {% if analysis.secrets %}
+                        {% for secret in analysis.secrets %}
+                        <div class="secret-item">{{ secret }}</div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="bi bi-check-circle-fill" style="font-size: 2rem; color: var(--accent-green);"></i>
+                            <p class="mt-2 mb-0" style="color: var(--accent-green); font-weight: 600;">Aucun secret codé en dur</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ Row 4: Permissions Table ═══════ -->
+    <div class="glass-card mb-4 fade-up fd7">
+        <div class="card-header-custom">
+            <div class="header-icon" style="background: rgba(99,102,241,0.1); color: var(--accent-primary);">
+                <i class="bi bi-shield-exclamation"></i>
+            </div>
+            <h5>Analyse IA des Permissions ({{ analysis.permissions | length }})</h5>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="perm-table">
+                <thead>
+                    <tr>
+                        <th>Permission</th>
+                        <th>Risque</th>
+                        <th>Analyse IA ({{ analysis.profile_label }})</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in analysis.permissions %}
+                    <tr>
+                        <td class="perm-name">
+                            <code>{{ p.short }}</code><br>
+                            <span class="perm-full">{{ p.permission }}</span>
+                        </td>
+                        <td>
+                            <span class="risk-badge risk-{{ p.risk }}">{{ p.risk | upper }}</span>
+                        </td>
+                        <td class="perm-justification">
+                            {{ p.justification if p.justification else '—' }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if not analysis.error %}
+
+    // ═══ Animated Score Ring ═══
+    const scoreValue = {{ analysis.score.value }};
+    const scoreRing = document.getElementById('scoreRing');
+    const scoreDisplay = document.getElementById('scoreValue');
+    const scoreLabel = document.getElementById('scoreLabel');
+
+    // Color based on score
+    let scoreColor;
+    if (scoreValue >= 80) scoreColor = '#10b981';
+    else if (scoreValue >= 60) scoreColor = '#6366f1';
+    else if (scoreValue >= 40) scoreColor = '#f59e0b';
+    else scoreColor = '#ef4444';
+
+    scoreRing.style.stroke = scoreColor;
+    scoreDisplay.style.color = scoreColor;
+    scoreLabel.style.color = scoreColor;
+
+    // Animate ring
+    const circumference = 2 * Math.PI * 80;
+    scoreRing.style.strokeDasharray = circumference;
+    scoreRing.style.strokeDashoffset = circumference;
+
+    setTimeout(() => {
+        const offset = circumference - (scoreValue / 100) * circumference;
+        scoreRing.style.strokeDashoffset = offset;
+    }, 300);
+
+    // Animate number
+    let current = 0;
+    const step = scoreValue / 40;
+    const counter = setInterval(() => {
+        current += step;
+        if (current >= scoreValue) {
+            current = scoreValue;
+            clearInterval(counter);
+        }
+        scoreDisplay.textContent = Math.round(current);
+    }, 25);
+
+    // ═══ Radar Chart (App vs Ideal Profile) ═══
+    {% if analysis.radar_data %}
+    const radarData = {{ analysis.radar_data | tojson | safe }};
+
+    new Chart(document.getElementById('radarChart'), {
+        type: 'radar',
+        data: {
+            labels: radarData.labels,
+            datasets: [
+                {
+                    label: "L'App",
+                    data: radarData.app_scores,
+                    backgroundColor: 'rgba(99, 102, 241, 0.25)',
+                    borderColor: 'rgba(99, 102, 241, 1)',
+                    pointBackgroundColor: 'rgba(99, 102, 241, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(99, 102, 241, 1)',
+                    borderWidth: 2,
+                },
+                {
+                    label: "Profil Idéal",
+                    data: radarData.ideal_scores,
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderColor: 'rgba(16, 185, 129, 0.8)',
+                    pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(16, 185, 129, 1)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    pointLabels: {
+                        color: '#94a3b8',
+                        font: { family: 'Inter', size: 10, weight: 600 }
+                    },
+                    ticks: {
+                        display: false,
+                        min: 0,
+                        max: 100,
+                        stepSize: 20
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#94a3b8',
+                        font: { family: 'Inter', size: 11 },
+                        usePointStyle: true,
+                        boxWidth: 8
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    titleColor: '#f1f5f9',
+                    bodyColor: '#94a3b8',
+                    borderColor: 'rgba(99, 102, 241, 0.2)',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                }
+            }
+        }
+    });
+    {% endif %}
+
+    // ═══ Tracker Distribution Donut ═══
+    {% if analysis.tracker_distribution %}
+    const trackerData = {{ analysis.tracker_distribution | tojson }};
+    const trackerLabels = { ads: 'Publicité', analytics: 'Analytics', attribution: 'Attribution', crash: 'Crash' };
+    const trackerColors = { ads: '#ef4444', analytics: '#f59e0b', attribution: '#8b5cf6', crash: '#06b6d4' };
+
+    const tLabels = Object.keys(trackerData).map(k => trackerLabels[k] || k);
+    const tValues = Object.values(trackerData);
+    const tColors = Object.keys(trackerData).map(k => trackerColors[k] || '#94a3b8');
+
+    const trackerCanvas = document.getElementById('trackerChart');
+    if (trackerCanvas) {
+        new Chart(trackerCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: tLabels,
+                datasets: [{
+                    data: tValues,
+                    backgroundColor: tColors.map(c => c + 'cc'),
+                    borderWidth: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '60%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#94a3b8',
+                            font: { family: 'Inter', size: 10 },
+                            padding: 8,
+                            usePointStyle: true,
+                            pointStyleWidth: 8,
+                        }
+                    }
+                },
+                animation: { duration: 1200 }
+            }
+        });
+    }
+    {% endif %}
+
+    {% endif %}
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
